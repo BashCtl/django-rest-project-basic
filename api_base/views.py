@@ -14,10 +14,16 @@ from .models import Article
 from .serializers import ArticleSerializer
 
 
-class ArticleViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin,
-                     mixins.UpdateModelMixin, mixins.RetrieveModelMixin):
+class ArticleViewSet(viewsets.ModelViewSet):
     serializer_class = ArticleSerializer
     queryset = Article.objects.all()
+
+
+
+# class ArticleViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin,
+#                      mixins.UpdateModelMixin, mixins.RetrieveModelMixin):
+#     serializer_class = ArticleSerializer
+#     queryset = Article.objects.all()
 
 
 
