@@ -1,23 +1,47 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import generics
-from rest_framework import mixins
+from rest_framework import generics, mixins, viewsets
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .models import Article
 from .serializers import ArticleSerializer
 
 
+class ArticleViewSet(viewsets.ViewSet):
+    def list(self, request):
+        articles = Article.objects.all()
+        article_serializer = ArticleSerializer(articles, many=True)
+        return Response(article_serializer.data)
+
+    def create(self, request):
+        article_serializer = ArticleSerializer(data=request.data)
+        if article_serializer.is_valid():
+            article_serializer.save()
+            return Response(article_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(article_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, pk=None):
+        queryset = Article.objects.all()
+        article = get_object_or_404(queryset, pk=pk)
+        article_serializer = ArticleSerializer(article)
+        return Response(article_serializer.data)
+
+    def update(self, request, pk=None):
+        article = Article.objects.get(pk=pk)
+        article_serializer = ArticleSerializer(article)
+        return Response(article_serializer.data)
+
+
 class GenericAPIView(generics.GenericAPIView, mixins.ListModelMixin,
                      mixins.CreateModelMixin, mixins.UpdateModelMixin,
                      mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
-
     serializer_class = ArticleSerializer
     queryset = Article.objects.all()
 
