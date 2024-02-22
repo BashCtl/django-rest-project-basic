@@ -14,34 +14,42 @@ from .models import Article
 from .serializers import ArticleSerializer
 
 
-class ArticleViewSet(viewsets.ViewSet):
-    def list(self, request):
-        articles = Article.objects.all()
-        article_serializer = ArticleSerializer(articles, many=True)
-        return Response(article_serializer.data)
+class ArticleViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin,
+                     mixins.UpdateModelMixin, mixins.RetrieveModelMixin):
+    serializer_class = ArticleSerializer
+    queryset = Article.objects.all()
 
-    def create(self, request):
-        article_serializer = ArticleSerializer(data=request.data)
-        if article_serializer.is_valid():
-            article_serializer.save()
-            return Response(article_serializer.data, status=status.HTTP_201_CREATED)
-        return Response(article_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def retrieve(self, request, pk=None):
-        queryset = Article.objects.all()
-        article = get_object_or_404(queryset, pk=pk)
-        article_serializer = ArticleSerializer(article)
-        return Response(article_serializer.data)
 
-    def update(self, request, pk=None):
-        article = Article.objects.get(pk=pk)
-        article_serializer = ArticleSerializer(article)
-        return Response(article_serializer.data)
+# class ArticleViewSet(viewsets.ViewSet):
+#     def list(self, request):
+#         articles = Article.objects.all()
+#         article_serializer = ArticleSerializer(articles, many=True)
+#         return Response(article_serializer.data)
+#
+#     def create(self, request):
+#         article_serializer = ArticleSerializer(data=request.data)
+#         if article_serializer.is_valid():
+#             article_serializer.save()
+#             return Response(article_serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(article_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
+#     def retrieve(self, request, pk=None):
+#         queryset = Article.objects.all()
+#         article = get_object_or_404(queryset, pk=pk)
+#         article_serializer = ArticleSerializer(article)
+#         return Response(article_serializer.data)
+#
+#     def update(self, request, pk=None):
+#         article = Article.objects.get(pk=pk)
+#         article_serializer = ArticleSerializer(article)
+#         return Response(article_serializer.data)
 
 
 class GenericAPIView(generics.GenericAPIView, mixins.ListModelMixin,
                      mixins.CreateModelMixin, mixins.UpdateModelMixin,
                      mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
+
     serializer_class = ArticleSerializer
     queryset = Article.objects.all()
 
